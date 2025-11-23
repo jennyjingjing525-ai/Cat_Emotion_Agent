@@ -1,83 +1,83 @@
-🐱 AI Cat Emotion Analysis Agent
+# CatKnows Agent 🐱
 
-This project implements a web-based agent that uses the Gemini API's Multimodality capabilities to analyze an uploaded image of a cat and determine its emotional state (e.g., Happy, Angry, Relaxed).
+> **Sharing pet moments lacks context, so I built a multimodal AI agent to understand our cat's current emotions and instantly write stories.**
 
-The application uses a secure Client/Server architecture:
+## 📖 Project Overview
+Pet owners often capture adorable moments but struggle to interpret their cat's subtle body language or come up with engaging captions for social media. **CatKnows Agent** is a multimodal AI application that solves this by acting as a translator between feline expressions and human language.
 
-Client (Customer Brower.html): Handles the user interface and image upload via JavaScript.
+It uses computer vision to analyze specific visual cues (ears, whiskers, eyes) and Generative AI to craft "Instagram-worthy" stories instantly.
 
-Server (emotion_server.py): A lightweight Flask server that securely handles the API key and sends the image data to Google's Gemini service.
+## 📂 Project Structure
+```text
+CatKnows-Agent/
+├── Customer_Browser.html  # Frontend Client (Tailwind + JS)
+├── emotion_server.py      # Flask Backend (Orchestrator)
+├── emotion_logic.py       # Agent A: Visual Analysis (Gemini 2.5)
+├── emotion_sharing.py     # Agent B: Social Content Generation
+├── KEY.env                # API Keys (Template for API keys)
+└── requirements.txt       # Python Dependencies
 
-🚀 Setup and Execution
+## 🏗 Architecture
+The project follows a decoupled client-server architecture using a lightweight Flask backend to manage asynchronous AI agents.
+Component Breakdown
+Frontend (Customer_Browser.html): A responsive web interface built with HTML and Tailwind CSS. It handles image drag-and-drop and sends requests to the backend endpoints (/analyze-emotion).
+![Web Interface Screenshot](web_interface.png)
 
-Prerequisites
+Backend Server (emotion_server.py): A Flask server that handles HTTP requests.
 
-Python 3.8+ (Recommended: Python 3.9.6, matching your VSC setup).
+AI Agents (Google ADK):
+Analysis Agent: Uses Gemini 2.5 Flash to analyze visual inputs (pupil size, ear position).
+Sharing Agent: Takes the analysis and generates social media captions.
 
-npm (for Live Server) or a modern browser.
+## 🧠 Technical Highlight: Async-Sync Bridge
+The application integrates the asynchronous Google Agent Development Kit (ADK) with a synchronous Flask server.
+Challenge: Flask runs synchronously by default, but the ADK agents require an asyncio event loop.
+Solution: A custom run_async wrapper in emotion_server.py creates and tears down a fresh isolated event loop for each HTTP request, preventing thread blocking and allowing the agents to run concurrently.
 
-A valid Gemini API Key. (Obtained from Google AI Studio).
+## 🤖 AI System Instructions
+The agents are prompted with domain-specific knowledge:
+Visual Decoder: Instructed to analyze "pupil size, whisker orientation, and ear position" to ensure scientific accuracy rather than just guessing.
+Social Writer: Instructed to format output specifically into "Instagram-worthy" captions and "Direct Message" formats.
 
-Step 1: Install Python Dependencies
+## 🚀 Key Features
+Multimodal Analysis: Uploads images directly to Gemini 2.5 Flash to decode complex visual data.
+Scientific "Decoding": Base conclusions on animal knowledge regarding body language.
+Social Context Generation: Automatically creates content tailored for specific social contexts.
+Interactive UI: Features a "Paw-sitive Insight" chat interface with loading animations.
 
-Open your VSC integrated terminal and install the required packages:
+## 🛠️ Tech Stack
+Model: Gemini 2.5 Flash
+Framework: Google Agent Development Kit (ADK)
+Backend: Python, Flask, Flask-CORS, Asyncio
+Frontend: HTML5, JavaScript, Tailwind CSS
 
-pip install Flask flask-cors requests
-
-
-Step 2: Configure the API Key (CRITICAL!)
-
-You must insert your private Gemini API key into the backend logic file.
-
-Open the file emotion_logic.py.
-
-Find the line defining API_KEY and replace the placeholder with your actual key:
-
-# emotion_logic.py
-API_KEY = "YOUR_ACTUAL_GEMINI_API_KEY_HERE" 
-
-
-Step 3: Start the Python Server
-
-Keep the terminal open in your project root directory and run the server. The server must be running before you open the client.
-
+⚙️ Setup & Installation
+Prerequisites: Python 3.13+, Google Cloud API Key.
+1. Clone the Repository
+Bash
+git clone <your-repo-url>
+cd catknow-agent
+2. Install Dependencies
+Bash
+pip install flask flask-cors python-dotenv google-adk google-genai
+Open KEY.env and paste your actual Google Gemini API key: (Note: Must be named KEY.env, not .env).
+GOOGLE_API_KEY=your_actual_api_key_here
+4. Run the Server
+Bash
 python emotion_server.py
+You will see the message: "--- Cat Emotion Server Starting (Decoupled Loops) ---"
+5. Launch the Application
+Open Customer Browser.html in your web browser. No build step required.
 
+## 📝 Usage Guide
+Upload: Click the upload icon or drag a cat photo into the modal.
+Analyze: Click "Run Analysis" to get a breakdown of your cat's mood.
+Share: Click "✨ Share on Social Media" to generate a caption like:
+"Living the purr-fect life! 🐾 Look at those relaxed whiskers..."
 
-The terminal will display output confirming the server is running on http://127.0.0.1:5000.
+## 🔮 Future Improvements
+Add support for video analysis of cat movements.
+Implement a history database to track mood over time.
+Allow users to customize the "tone" (e.g., Sarcastic, Loving).
 
-Step 4: Run the Client (Web Interface)
-
-Open the Customer Brower.html file in VSC.
-
-Right-click the file in the Explorer panel and select "Open with Live Server" (if you have the extension installed).
-
-The chat interface will open in your browser, ready to analyze images.
-
-🛠 Troubleshooting (403 Forbidden Error)
-
-If you upload an image and the client displays an error like:
-
-Image Analysis Failed. Check VSC Terminal for Server Error. Details: Final API call failed... Error: 403 Client Error: Forbidden
-
-This is an Authentication Error. Here are the two most likely causes and solutions:
-
-Problem
-
-Cause
-
-Solution
-
-Invalid Key
-
-The key in emotion_logic.py is expired or incorrect.
-
-Double-check the key in emotion_logic.py against your Google AI Studio dashboard.
-
-API Not Enabled
-
-Your Google Cloud Project has not enabled the necessary API permissions for image analysis.
-
-Go to your Google Cloud Console, ensure your project is selected, and verify that the Gemini API is enabled under "APIs & Services."
-
-Always remember to stop the server (Ctrl+C) and restart it after changing the emotion_logic.py file.
+Built with ❤️ for cats.

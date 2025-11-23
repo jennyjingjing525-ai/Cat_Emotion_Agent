@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Pet Agent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .chat-bubble { max-width: 80%; word-wrap: break-word; }
+        .chat-container::-webkit-scrollbar { width: 8px; }
+        .chat-container::-webkit-scrollbar-thumb { background-color: #9ca3af; border-radius: 4px; }
+        .quick-action-btn { @apply text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-1 px-3 rounded-full transition-colors duration-200; }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+    <div class="w-full max-w-2xl h-full md:h-[90vh] flex flex-col bg-white rounded-lg shadow-xl border border-gray-200">
+        <div class="bg-gray-800 text-white p-4 rounded-t-lg flex items-center shadow-md">
+            <svg class="w-8 h-8 mr-3 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v1.586m-6.854.421l1.13 1.13m9.448-1.13l-1.13 1.13M6.253 12l1.586 0M16.16 12l1.586 0M6.854 17.147l1.13-1.13M17.748 16.018l-1.13-1-1.13M12 21.747v-1.586M4.252 8.498a7.5 7.5 0 0115.496 0c0 1.594-.582 3.06-1.556 4.153l-3.21 3.21a1.5 1.5 0 01-2.122 0l-3.21-3.21A7.472 7.472 0 014.252 8.498z"></path></svg>
+            <h1 class="text-xl font-bold">Know Your Cat</h1>
+        </div>
+
+        <div id="chat-container" class="flex-1 p-6 overflow-y-auto chat-container">
+            <div class="flex justify-start mb-4">
+                <div class="chat-bubble bg-gray-200 text-gray-800 rounded-lg py-2 px-4">
+                    <p class="text-sm">😻 Paw-sitive Insight! Upload a picture of your cat to find out what they are thinking!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 bg-white border-t border-gray-200 rounded-b-lg">
+             <div id="loading-spinner" class="hidden flex flex-col items-center justify-center mb-2 space-y-2">
+                <svg class="w-16 h-16 text-yellow-500 animate-bounce" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/></svg>
+                <p class="text-sm text-gray-600 font-medium">Pawsitive AI is thinking...</p>
+            </div>
+            <div class="flex items-center">
+                <button id="upload-btn" class="mr-2 text-gray-500 hover:text-yellow-600 p-2 rounded-full transition duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+                <input type="text" id="user-input" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-500" placeholder="Ask a question or upload an image...">
+                <button id="send-btn" class="ml-3 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-5 rounded-full transition duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </button>
+            </div>
+            <div class="mt-3 flex flex-wrap justify-center gap-2">
+                <button class="quick-action-btn" data-prompt="Generate a concise, attention-grabbing caption suitable for a post about my cat's image emotional state. ">✨ Share on Social Media</button>
+                <button class="quick-action-btn" data-prompt="Generate a brief, lighthearted text message about my cat's image emotional states to share this with my friends. ">✨ Share with Friends</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="upload-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 transform transition-all duration-300 scale-100">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center">Analyze Image</h2>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <p class="text-sm text-gray-600 mb-4">Upload an image of your cat.</p>
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-yellow-500 transition duration-200" onclick="document.getElementById('modal-image-upload').click()">
+                <svg class="w-10 h-10 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                <p class="mt-2 text-sm font-medium text-gray-600" id="file-label">Click to select image or drag here</p>
+                <input type="file" id="modal-image-upload" class="hidden" accept="image/*">
+            </div>
+            <button id="analyze-modal-btn" class="w-full mt-6 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 rounded-xl transition duration-300 opacity-50 cursor-not-allowed" disabled>Run Analysis</button>
+            <p id="image-error" class="text-red-500 text-sm mt-2 hidden">Please select an image file before analyzing.</p>
+        </div>
+    </div>
+
+    <script>
+        const sendBtn = document.getElementById('send-btn');
+        const userInput = document.getElementById('user-input');
+        const chatContainer = document.getElementById('chat-container');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const uploadBtn = document.getElementById('upload-btn');
+        const uploadModal = document.getElementById('upload-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const modalImageUpload = document.getElementById('modal-image-upload');
+        const analyzeModalBtn = document.getElementById('analyze-modal-btn');
+        const fileLabel = document.getElementById('file-label');
+        const uploadClickArea = fileLabel.closest('div');
+        
+        // STATE VARIABLES
+        let latestImageBase64 = null;
+        let pendingSharePrompt = null;
+
+        const SERVER_IMAGE_ENDPOINT = 'http://127.0.0.1:5000/analyze-emotion'; 
+        const SERVER_TEXT_ENDPOINT = 'http://127.0.0.1:5000/analyze-text';  
+
+        // Event Listeners
+        sendBtn.addEventListener('click', handleUserMessage);
+        uploadClickArea.addEventListener('click', () => modalImageUpload.click());
+        userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleUserMessage(); });
+        uploadBtn.addEventListener('click', () => uploadModal.classList.remove('hidden'));
+        closeModalBtn.addEventListener('click', closeUploadModal);
+        modalImageUpload.addEventListener('change', handleModalFileChange);
+        analyzeModalBtn.addEventListener('click', handleModalAnalysis);
+
+        // Share Button Logic
+        document.querySelectorAll('.quick-action-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const message = "I will generate a social media post caption using your latest cat photo.";
+                addMessage(message, 'ai');
+
+                const file = modalImageUpload.files[0];
+                let base64ImageToShare;
+
+                if (file) {
+                    base64ImageToShare = await toBase64(file);
+                    latestImageBase64 = base64ImageToShare;
+                } else if (latestImageBase64) {
+                    base64ImageToShare = latestImageBase64;
+                } else {
+                    // If no image, save intent and prompt user
+                    pendingSharePrompt = button.dataset.prompt;
+                    setTimeout(() => {
+                        uploadModal.classList.remove('hidden');
+                        addMessage("Please upload a cat photo first.", 'ai');
+                    }, 3000);
+                    return;
+                }
+
+                // If image exists, share immediately
+                try {
+                    showLoading(true);
+                    await callPythonServerShare(base64ImageToShare, button.dataset.prompt);
+                } catch (error) {
+                    console.error("Share Error:", error);
+                    addMessage(`Sharing Failed. Details: ${error.message}`, 'ai');
+                } finally {
+                    showLoading(false);
+                }
+            });
+        });
+
+        // Server Call: Sharing
+        async function callPythonServerShare(base64ImageData, userPrompt) {
+            const mimeType = base64ImageData.substring(base64ImageData.indexOf(":") + 1, base64ImageData.indexOf(";"));
+            const pureBase64 = base64ImageData.substring(base64ImageData.indexOf(",") + 1);
+            const SERVER_SHARE_ENDPOINT = 'http://127.0.0.1:5000/share-emotion';
+
+            const response = await fetch(SERVER_SHARE_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image_data: pureBase64, mime_type: mimeType, prompt: userPrompt })
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`Server error: ${errorBody}`);
+            }
+            const result = await response.json();
+            if (result.error) throw new Error(result.error);
+            processServerResponse(result.result); 
+        }
+
+        // Server Call: Image Analysis
+        async function callPythonServerImage(base64ImageData, userPrompt) {
+            const mimeType = base64ImageData.substring(base64ImageData.indexOf(":") + 1, base64ImageData.indexOf(";"));
+            const pureBase64 = base64ImageData.substring(base64ImageData.indexOf(",") + 1);
+
+            const response = await fetch(SERVER_IMAGE_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image_data: pureBase64, mime_type: mimeType, prompt: userPrompt })
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`Server error: ${errorBody}`);
+            }
+            const result = await response.json();
+            if (result.error) throw new Error(result.error);
+            processServerResponse(result.result); 
+        }
+
+        // Modal Analysis Handler
+        async function handleModalAnalysis() {
+            const file = modalImageUpload.files[0];
+            if (!file) return;
+            
+            closeUploadModal();
+            
+            try {
+                const base64Image = await toBase64(file);
+                latestImageBase64 = base64Image;
+                addMessage(base64Image, 'user', 'image');
+                showLoading(true);
+
+                // CHECK IF WE ARE SHARING OR ANALYZING
+                if (pendingSharePrompt) {
+                    await callPythonServerShare(base64Image, pendingSharePrompt);
+                    pendingSharePrompt = null;
+                } else {
+                    const prompt = "Analyze the cat's emotional state in this image.";
+                    await callPythonServerImage(base64Image, prompt);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                addMessage(`Analysis Failed. Details: ${error.message}`, 'ai');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // UI Helper Functions
+        function addMessage(content, sender, type = 'text') {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('flex', 'mb-4', sender === 'user' ? 'justify-end' : 'justify-start');
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.classList.add('chat-bubble', 'rounded-lg', 'py-2', 'px-4', sender === 'user' ? 'bg-yellow-500' : 'bg-gray-200');
+            if (sender === 'user') bubbleDiv.classList.add('text-white'); else bubbleDiv.classList.add('text-gray-800');
+
+            if (type === 'text') {
+                bubbleDiv.innerHTML = `<p class="text-sm">${content.replace(/\n/g, '<br>')}</p>`;
+            } else {
+                bubbleDiv.innerHTML = `<img src="${content}" class="rounded-lg max-w-xs max-h-60 shadow-lg">`;
+                bubbleDiv.classList.remove('py-2', 'px-4');
+            }
+            messageDiv.appendChild(bubbleDiv);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function processServerResponse(msg) { addMessage(msg, 'ai'); }
+        const toBase64 = file => new Promise((res, rej) => { const r = new FileReader(); r.readAsDataURL(file); r.onload = () => res(r.result); r.onerror = e => rej(e); });
+        function showLoading(isLoading) { loadingSpinner.classList.toggle('hidden', !isLoading); sendBtn.disabled = isLoading; uploadBtn.disabled = isLoading; }
+        
+        function closeUploadModal() {
+            uploadModal.classList.add('hidden');
+            modalImageUpload.value = '';
+            // DO NOT CLEAR pendingSharePrompt HERE (We want to remember it if user just closed modal to reopen)
+            // If you want to clear it on explicit close, uncomment: pendingSharePrompt = null; 
+            fileLabel.textContent = 'Click to select image or drag here';
+            analyzeModalBtn.disabled = true;
+            analyzeModalBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('image-error').classList.add('hidden');
+        }
+
+        function handleModalFileChange() {
+            const file = modalImageUpload.files[0];
+            if (file) {
+                fileLabel.textContent = `Selected: ${file.name}`;
+                analyzeModalBtn.disabled = false;
+                analyzeModalBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+        async function handleUserMessage() {
+             const msg = userInput.value.trim();
+             if(!msg) return;
+             addMessage(msg, 'user');
+             userInput.value = '';
+             addMessage("Text chat disabled. Please use image upload.", 'ai');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# 忽略虚拟环境（这是那9000个文件的主要来源）
+.venv/
+venv/
+env/
+
+# 忽略密钥和敏感信息
+.env
+KEY.env
+
+# 忽略Python缓存文件
+__pycache__/
+*.pyc
+
+# 忽略Mac系统文件
+.DS_Store
