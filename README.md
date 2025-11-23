@@ -60,6 +60,7 @@ cd catknow-agent
 2. Install Dependencies
 Bash
 pip install flask flask-cors python-dotenv google-adk google-genai
+3. Configure Environment
 Open KEY.env and paste your actual Google Gemini API key: (Note: Must be named KEY.env, not .env).
 GOOGLE_API_KEY=your_actual_api_key_here
 4. Run the Server
