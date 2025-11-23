@@ -55,13 +55,13 @@ Frontend: HTML5, JavaScript, Tailwind CSS
 Prerequisites: Python 3.13+, Google Cloud API Key.
 1. Clone the Repository
 Bash
-git clone <your-repo-url>
-cd catknow-agent
+git clone https://github.com/jennyjingjing525-ai/Cat_Emotion_Agent
+cd Cat_Emotion_Agent
 2. Install Dependencies
 Bash
 pip install flask flask-cors python-dotenv google-adk google-genai
 3. Configure Environment
-Open KEY.env and paste your actual Google Gemini API key: (Note: Must be named KEY.env, not .env).
+Create a new file named `KEY.env` (Must be named exactly `KEY.env`, not `.env`) and paste your actual Google Gemini API key: 
 GOOGLE_API_KEY=your_actual_api_key_here
 4. Run the Server
 Bash
